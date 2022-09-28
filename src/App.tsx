@@ -1,57 +1,16 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
+import { useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { SignIn, SignUp, Tasks, Home } from './components/components';
 import './App.css';
 
-type User = {
-  password: string;
-  email: string;
-};
-
 function App() {
-  const [count, setCount] = useState<number>(0);
-  const getUser = async () => {
-    const user = JSON.stringify({
-      password: 'newmail2',
-      email: 'newmail2@gmail.com',
-    });
-    const res = await fetch(
-      'https://cptshell-task-manager.herokuapp.com/users/login',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: user,
-      }
-    );
-    const data = await res.json();
-    console.log(data);
-  };
-  getUser();
-
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+    <Routes>
+      <Route path="/signup" element={<SignIn />} />
+      <Route path="/signin" element={<SignUp />} />
+      <Route path="/tasks" element={<Tasks />} />
+      <Route path="*" element={<Home />} />
+    </Routes>
   );
 }
 
