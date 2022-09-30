@@ -25,11 +25,17 @@ export const Home: FC = () => {
     console.log(user);
   };
 
+  const handleDelete = async () => {
+    const result = await userApi.deleteUser();
+    console.log(result);
+  };
+
   return (
     <>
       <h2>Home</h2>
       <button onClick={handleCreate}>create user</button>
       <button onClick={handleLogin}>login user</button>
+      <button onClick={handleDelete}>delete user</button>
     </>
   );
 };
