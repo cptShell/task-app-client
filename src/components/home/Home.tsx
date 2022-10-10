@@ -1,6 +1,6 @@
 import { FC } from 'react';
+import { LoginUserDTO, CreateUserDTO } from '../../common/types/user';
 import { UserApi } from '../../services/userAPI';
-import { CreateUserDTO, LoginUserDTO } from '../../types/user';
 
 export const Home: FC = () => {
   const loginPayload: LoginUserDTO = {

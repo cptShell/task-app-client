@@ -1,16 +1,11 @@
-import { CreateUserDTO, LoginUserDTO, User } from '../types/user';
 import axios, { Axios, AxiosError } from 'axios';
-
-type CreateUserError = {
-  message: string;
-  name: string;
-};
-
-type ApiResponse<T> = {
-  status: string;
-  message?: string;
-  data?: T;
-};
+import { UserApiPath } from '../common/enums/enums';
+import {
+  ApiResponse,
+  CreateUserDTO,
+  LoginUserDTO,
+  User,
+} from '../common/types/types';
 
 export class UserApi {
   #axiosInstance: Axios;
@@ -22,19 +17,20 @@ export class UserApi {
   }
 
   async createUser(payload: CreateUserDTO): Promise<ApiResponse<User>> {
-    const url = 'users';
-
     try {
-      const { data } = await this.#axiosInstance.post<User>(url, payload, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const { data } = await this.#axiosInstance.post<User>(
+        UserApiPath.USER,
+        payload,
+        { headers: { 'Content-Type': 'application/json' } }
+      );
       localStorage.setItem('task-app-user-token', data.token);
 
       return { status: 'ok', data };
     } catch (error) {
       let message: string;
+
       if (axios.isAxiosError(error)) {
-        message = (error.response?.data as CreateUserError).message;
+        message = (error.response?.data as AxiosError).message;
       } else {
         message = error as string;
       }
@@ -44,12 +40,12 @@ export class UserApi {
   }
 
   async loginUser(payload: LoginUserDTO): Promise<ApiResponse<User>> {
-    const url = 'users/login';
-
     try {
-      const { data } = await this.#axiosInstance.post<User>(url, payload, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const { data } = await this.#axiosInstance.post<User>(
+        UserApiPath.LOGIN,
+        payload,
+        { headers: { 'Content-Type': 'application/json' } }
+      );
       localStorage.setItem('task-app-user-token', data.token);
 
       return { status: 'ok', data };
@@ -57,7 +53,7 @@ export class UserApi {
       let message: string;
 
       if (axios.isAxiosError(error)) {
-        message = (error.response?.data as CreateUserError).message;
+        message = (error.response?.data as AxiosError).message;
       } else {
         message = error as string;
       }
@@ -67,12 +63,11 @@ export class UserApi {
   }
 
   async deleteUser(): Promise<ApiResponse<null>> {
-    const url = 'users/me';
     const token = localStorage.getItem('task-app-user-token');
     const headers = { Authorization: `Bearer ${token}` };
 
     if (token) {
-      const res = await this.#axiosInstance.delete(url, { headers });
+      await this.#axiosInstance.delete(UserApiPath.PROFILE, { headers });
 
       localStorage.clear();
 
