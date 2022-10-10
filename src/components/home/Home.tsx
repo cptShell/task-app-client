@@ -33,9 +33,12 @@ export const Home: FC = () => {
   return (
     <>
       <h2>Home</h2>
-      <button onClick={handleCreate}>create user</button>
-      <button onClick={handleLogin}>login user</button>
-      <button onClick={handleDelete}>delete user</button>
+      <div></div>
+      <div>
+        <button onClick={handleCreate}>create user</button>
+        <button onClick={handleLogin}>login user</button>
+        <button onClick={handleDelete}>delete user</button>
+      </div>
     </>
   );
 };
