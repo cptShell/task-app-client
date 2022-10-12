@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { LoginUserDTO, CreateUserDTO } from '../../common/types/user';
-import { UserApi } from '../../services/userAPI';
+import { userApi } from '../../services/services';
 
 export const Home: FC = () => {
   const loginPayload: LoginUserDTO = {
@@ -13,7 +13,6 @@ export const Home: FC = () => {
     age: 26,
     password: 'newmail2',
   };
-  const userApi = new UserApi('http://localhost:3000');
 
   const handleCreate = async () => {
     const user = await userApi.createUser(createPayload);

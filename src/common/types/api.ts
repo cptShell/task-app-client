@@ -1,7 +1,6 @@
 export type ApiResponse<T> = {
-  status: string;
-  message?: string;
-  data?: T;
+  message: string;
+  data: T;
 };
 
 export type ApiError = {

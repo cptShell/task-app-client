@@ -1,11 +1,12 @@
 import axios, { Axios, AxiosError } from 'axios';
-import { UserApiPath } from '../common/enums/enums';
+import { StorageKey, UserApiPath } from '../common/enums/enums';
 import {
   ApiResponse,
   CreateUserDTO,
   LoginUserDTO,
   User,
 } from '../common/types/types';
+import { storage } from './services';
 
 export class UserApi {
   #axiosInstance: Axios;
@@ -16,16 +17,16 @@ export class UserApi {
     });
   }
 
-  async createUser(payload: CreateUserDTO): Promise<ApiResponse<User>> {
+  async createUser(payload: CreateUserDTO): Promise<ApiResponse<User | null>> {
     try {
       const { data } = await this.#axiosInstance.post<User>(
         UserApiPath.USER,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
-      localStorage.setItem('task-app-user-token', data.token);
+      storage.setItem(StorageKey.TOKEN, data.token);
 
-      return { status: 'ok', data };
+      return { data, message: 'ok' };
     } catch (error) {
       let message: string;
 
@@ -35,20 +36,20 @@ export class UserApi {
         message = error as string;
       }
 
-      return { status: 'failed', message };
+      return { data: null, message };
     }
   }
 
-  async loginUser(payload: LoginUserDTO): Promise<ApiResponse<User>> {
+  async loginUser(payload: LoginUserDTO): Promise<ApiResponse<User | null>> {
     try {
       const { data } = await this.#axiosInstance.post<User>(
         UserApiPath.LOGIN,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
-      localStorage.setItem('task-app-user-token', data.token);
+      storage.setItem(StorageKey.TOKEN, data.token);
 
-      return { status: 'ok', data };
+      return { data, message: 'ok' };
     } catch (error) {
       let message: string;
 
@@ -58,22 +59,37 @@ export class UserApi {
         message = error as string;
       }
 
-      return { status: 'failed', message };
+      return { data: null, message };
     }
   }
 
-  async deleteUser(): Promise<ApiResponse<null>> {
+  async deleteUser(): Promise<ApiResponse<boolean>> {
     const token = localStorage.getItem('task-app-user-token');
     const headers = { Authorization: `Bearer ${token}` };
 
     if (token) {
       await this.#axiosInstance.delete(UserApiPath.PROFILE, { headers });
 
-      localStorage.clear();
+      storage.remove(StorageKey.TOKEN);
 
-      return { status: 'ok', data: null };
+      return { data: true, message: 'ok' };
     }
 
-    return { status: 'failed', message: 'User not found!' };
+    return { data: false, message: 'User not found!' };
+  }
+
+  async logoutUser(): Promise<ApiResponse<boolean>> {
+    const token = localStorage.getItem('task-app-user-token');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    if (token) {
+      await this.#axiosInstance.post(UserApiPath.PROFILE, { headers });
+
+      storage.remove(StorageKey.TOKEN);
+
+      return { data: true, message: 'ok' };
+    }
+
+    return { data: false, message: 'User not found!' };
   }
 }
