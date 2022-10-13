@@ -1,4 +1,4 @@
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Outlet } from 'react-router-dom';
 import {
   SignIn,
   SignUp,
@@ -6,6 +6,7 @@ import {
   Home,
   Profile,
   Header,
+  PrivateRoute,
 } from './components/components';
 import './App.css';
 
@@ -17,8 +18,10 @@ function App() {
         <Routes>
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route element={<PrivateRoute />}>
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
           <Route path="*" element={<Home />} />
         </Routes>
       </div>

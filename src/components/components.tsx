@@ -4,3 +4,4 @@ export { SignIn } from './sign-in/SignIn';
 export { Tasks } from './tasks/Tasks';
 export { Profile } from './profile/Profile';
 export { Header } from './header/Header';
+export { PrivateRoute } from './private-route/private-route';

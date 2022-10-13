@@ -1,8 +1,10 @@
 import { FC } from 'react';
 import { LoginUserDTO, CreateUserDTO } from '../../common/types/user';
-import { userApi } from '../../services/services';
+import { useAppDispatch } from '../../hooks/use-app-dispatch';
+import { user as userActions } from '../../store/actions';
 
 export const Home: FC = () => {
+  const dispatch = useAppDispatch();
   const loginPayload: LoginUserDTO = {
     password: 'newmail2',
     email: 'repozheka@gmail.com',
@@ -15,28 +17,29 @@ export const Home: FC = () => {
   };
 
   const handleCreate = async () => {
-    const user = await userApi.createUser(createPayload);
-    console.log(user);
+    dispatch(userActions.signUp(createPayload));
   };
 
   const handleLogin = async () => {
-    const user = await userApi.loginUser(loginPayload);
-    console.log(user);
+    dispatch(userActions.signIn(loginPayload));
   };
 
   const handleDelete = async () => {
-    const result = await userApi.deleteUser();
-    console.log(result);
+    dispatch(userActions.deleteSelf());
+  };
+
+  const handleLogout = async () => {
+    dispatch(userActions.signOut());
   };
 
   return (
     <>
       <h2>Home</h2>
-      <div></div>
       <div>
         <button onClick={handleCreate}>create user</button>
         <button onClick={handleLogin}>login user</button>
         <button onClick={handleDelete}>delete user</button>
+        <button onClick={handleLogout}>logiut user</button>
       </div>
     </>
   );

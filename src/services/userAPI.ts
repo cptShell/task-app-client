@@ -1,10 +1,12 @@
 import axios, { Axios, AxiosError } from 'axios';
 import { StorageKey, UserApiPath } from '../common/enums/enums';
 import {
+  ApiError,
   ApiResponse,
   CreateUserDTO,
   LoginUserDTO,
   User,
+  UserDto,
 } from '../common/types/types';
 import { storage } from './services';
 
@@ -19,19 +21,23 @@ export class UserApi {
 
   async createUser(payload: CreateUserDTO): Promise<ApiResponse<User | null>> {
     try {
-      const { data } = await this.#axiosInstance.post<User>(
+      const { data } = await this.#axiosInstance.post<UserDto>(
         UserApiPath.USER,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
       );
+
       storage.setItem(StorageKey.TOKEN, data.token);
 
-      return { data, message: 'ok' };
+      return {
+        data: { token: data.token, ...data.user },
+        message: 'ok',
+      };
     } catch (error) {
       let message: string;
 
       if (axios.isAxiosError(error)) {
-        message = (error.response?.data as AxiosError).message;
+        message = (error.response?.data as ApiError).error;
       } else {
         message = error as string;
       }
@@ -40,9 +46,9 @@ export class UserApi {
     }
   }
 
-  async loginUser(payload: LoginUserDTO): Promise<ApiResponse<User | null>> {
+  async loginUser(payload: LoginUserDTO): Promise<ApiResponse<UserDto | null>> {
     try {
-      const { data } = await this.#axiosInstance.post<User>(
+      const { data } = await this.#axiosInstance.post<UserDto>(
         UserApiPath.LOGIN,
         payload,
         { headers: { 'Content-Type': 'application/json' } }
@@ -54,7 +60,7 @@ export class UserApi {
       let message: string;
 
       if (axios.isAxiosError(error)) {
-        message = (error.response?.data as AxiosError).message;
+        message = (error.response?.data as ApiError).error;
       } else {
         message = error as string;
       }
@@ -64,7 +70,7 @@ export class UserApi {
   }
 
   async deleteUser(): Promise<ApiResponse<boolean>> {
-    const token = localStorage.getItem('task-app-user-token');
+    const token = storage.getItem(StorageKey.TOKEN);
     const headers = { Authorization: `Bearer ${token}` };
 
     if (token) {

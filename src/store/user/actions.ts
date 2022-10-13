@@ -1,39 +1,62 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { AsyncThunkConfig } from '../../common/app/async-thunk-config';
-import { CreateUserDTO, LoginUserDTO, User } from '../../common/types/types';
+import {
+  ApiResponse,
+  AsyncThunkConfig,
+  CreateUserDTO,
+  LoginUserDTO,
+  User,
+} from '../../common/types/types';
 import { userApi } from '../../services/services';
 import { ActionType } from './common';
 
 export const signIn = createAsyncThunk<
-  User | string,
+  ApiResponse<User | null>,
   LoginUserDTO,
   AsyncThunkConfig
 >(ActionType.SIGN_IN, async (payload, { extra }) => {
   const { data, message } = await userApi.loginUser(payload);
+  if (data) {
+    return {
+      data: { token: data.token, ...data.user },
+      message,
+    };
+  }
 
-  return data || message;
+  console.log({ data, message });
+
+  return { data, message };
 });
 
 export const signUp = createAsyncThunk<
-  User | string,
+  ApiResponse<User | null>,
   CreateUserDTO,
   AsyncThunkConfig
->(ActionType.SIGN_UP, async (payload, { extra }) => {
+>(ActionType.SIGN_UP, async (payload) => {
   const { data, message } = await userApi.createUser(payload);
+  if (data) {
+    return {
+      data,
+      message,
+    };
+  }
 
-  return data || message;
+  console.log({ data, message });
+
+  return { data, message };
 });
 
 export const signOut = createAsyncThunk<void, void, AsyncThunkConfig>(
   ActionType.SIGN_OUT,
   async (_payload, { extra }) => {
-    await userApi.logoutUser();
+    const response = await userApi.logoutUser();
+    console.log(response);
   }
 );
 
 export const deleteSelf = createAsyncThunk<void, void, AsyncThunkConfig>(
   ActionType.DELETE,
   async (_payload, { extra }) => {
-    await userApi.deleteUser();
+    const response = await userApi.deleteUser();
+    console.log(response);
   }
 );
