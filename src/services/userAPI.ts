@@ -1,4 +1,4 @@
-import axios, { Axios, AxiosError } from 'axios';
+import axios, { Axios } from 'axios';
 import { StorageKey, UserApiPath } from '../common/enums/enums';
 import {
   ApiError,
