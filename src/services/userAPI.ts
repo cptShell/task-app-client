@@ -69,6 +69,33 @@ export class UserApi {
     }
   }
 
+  async getAuthUser(): Promise<ApiResponse<UserDto | null>> {
+    const token = storage.getItem(StorageKey.TOKEN);
+    const payload = { token };
+
+    if (!token) return { data: null, message: 'Unauthorized' };
+
+    try {
+      const { data } = await this.#axiosInstance.post<UserDto>(
+        UserApiPath.USER_FROM_TOKEN,
+        payload,
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+
+      return { data, message: 'ok' };
+    } catch (error) {
+      let message: string;
+
+      if (axios.isAxiosError(error)) {
+        message = (error.response?.data as ApiError).error;
+      } else {
+        message = error as string;
+      }
+
+      return { data: null, message };
+    }
+  }
+
   async deleteUser(): Promise<ApiResponse<boolean>> {
     const token = storage.getItem(StorageKey.TOKEN);
     const headers = { Authorization: `Bearer ${token}` };
@@ -85,11 +112,12 @@ export class UserApi {
   }
 
   async logoutUser(): Promise<ApiResponse<boolean>> {
-    const token = localStorage.getItem('task-app-user-token');
+    const token = storage.getItem(StorageKey.TOKEN);
     const headers = { Authorization: `Bearer ${token}` };
 
     if (token) {
-      await this.#axiosInstance.post(UserApiPath.PROFILE, { headers });
+      this.#axiosInstance.defaults.headers.common = headers;
+      await this.#axiosInstance.post(UserApiPath.LOGOUT);
 
       storage.remove(StorageKey.TOKEN);
 

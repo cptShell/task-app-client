@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import {
   SignIn,
   SignUp,
@@ -9,8 +9,21 @@ import {
   PrivateRoute,
 } from './components/components';
 import './App.css';
+import { useAppDispatch, useAppSelector } from './hooks/hooks';
+import { useEffect } from 'react';
+import { user as userActions } from './store/actions';
 
 function App() {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user.user);
+
+  useEffect(() => {
+    const auth = async () => {
+      if (!user) dispatch(userActions.getAuthUser());
+    };
+    auth();
+  }, []);
+
   return (
     <div>
       <Header />

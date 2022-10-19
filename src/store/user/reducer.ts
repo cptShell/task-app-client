@@ -1,6 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { User } from '../../common/types/types';
-import { deleteSelf, signIn, signOut, signUp } from './actions';
+import { deleteSelf, getAuthUser, signIn, signOut, signUp } from './actions';
 
 type State = {
   user: User | null;
@@ -11,20 +11,19 @@ const initialState: State = {
 };
 
 export const reducer = createReducer(initialState, (builder) => {
+  builder.addCase(getAuthUser.fulfilled, (state, action) => {
+    if (action.payload.data) state.user = action.payload.data;
+  });
   builder.addCase(signIn.fulfilled, (state, action) => {
-    if (action.payload.data) {
-      state.user = action.payload.data;
-    }
+    if (action.payload.data) state.user = action.payload.data;
   });
   builder.addCase(signUp.fulfilled, (state, action) => {
-    if (action.payload.data) {
-      state.user = action.payload.data;
-    }
+    if (action.payload.data) state.user = action.payload.data;
   });
-  builder.addCase(signOut.fulfilled, (state, action) => {
+  builder.addCase(signOut.fulfilled, (state) => {
     state.user = null;
   });
-  builder.addCase(deleteSelf.fulfilled, (state, action) => {
+  builder.addCase(deleteSelf.fulfilled, (state) => {
     state.user = null;
   });
 });

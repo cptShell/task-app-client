@@ -27,6 +27,25 @@ export const signIn = createAsyncThunk<
   return { data, message };
 });
 
+export const getAuthUser = createAsyncThunk<
+  ApiResponse<User | null>,
+  void,
+  AsyncThunkConfig
+>(ActionType.GET_AUTH_USER, async (_payload, { extra }) => {
+  const { data, message } = await userApi.getAuthUser();
+
+  if (data) {
+    return {
+      data: { token: data.token, ...data.user },
+      message,
+    };
+  }
+
+  console.log({ data, message });
+
+  return { data, message };
+});
+
 export const signUp = createAsyncThunk<
   ApiResponse<User | null>,
   CreateUserDTO,
