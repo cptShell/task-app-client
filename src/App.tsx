@@ -12,6 +12,8 @@ import './App.css';
 import { useAppDispatch, useAppSelector } from './hooks/hooks';
 import { useEffect } from 'react';
 import { user as userActions } from './store/actions';
+import { storage } from './services/services';
+import { StorageKey } from './common/enums/storage-key';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -19,7 +21,9 @@ function App() {
 
   useEffect(() => {
     const auth = async () => {
-      if (!user) dispatch(userActions.getAuthUser());
+      const token = storage.getItem(StorageKey.TOKEN);
+
+      if (!user || token) dispatch(userActions.getAuthUser());
     };
     auth();
   }, []);
@@ -31,10 +35,12 @@ function App() {
         <Routes>
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
-          <Route element={<PrivateRoute />}>
-            <Route path="/tasks" element={<Tasks />} />
-            <Route path="/profile" element={<Profile />} />
-          </Route>
+          {user && (
+            <Route element={<PrivateRoute />}>
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/profile" element={<Profile user={user} />} />
+            </Route>
+          )}
           <Route path="*" element={<Home />} />
         </Routes>
       </div>

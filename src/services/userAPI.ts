@@ -46,6 +46,42 @@ export class UserApi {
     }
   }
 
+  async updateUser(
+    payload: Partial<CreateUserDTO>
+  ): Promise<ApiResponse<User | null>> {
+    try {
+      const token = storage.getItem(StorageKey.TOKEN);
+
+      if (!token) return { data: null, message: 'Unauthorized' };
+
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      };
+
+      const { data } = await this.#axiosInstance.patch<UserDto>(
+        UserApiPath.PROFILE,
+        payload,
+        { headers }
+      );
+
+      return {
+        data: { token: data.token, ...data.user },
+        message: 'ok',
+      };
+    } catch (error) {
+      let message: string;
+
+      if (axios.isAxiosError(error)) {
+        message = (error.response?.data as ApiError).error;
+      } else {
+        message = error as string;
+      }
+
+      return { data: null, message };
+    }
+  }
+
   async loginUser(payload: LoginUserDTO): Promise<ApiResponse<UserDto | null>> {
     try {
       const { data } = await this.#axiosInstance.post<UserDto>(
