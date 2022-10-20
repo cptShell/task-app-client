@@ -1,9 +1,19 @@
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
-import { useAppSelector } from '../../hooks/hooks';
+import { User } from '../../common/types/types';
+import { useAppDispatch } from '../../hooks/use-app-dispatch';
+import { user as userActions } from '../../store/actions';
 
-export const Header: FC = () => {
-  const user = useAppSelector((state) => state.user.user);
+type Props = {
+  user: User | null;
+};
+
+export const Header: FC<Props> = ({ user }) => {
+  const dispatch = useAppDispatch();
+
+  const handleSignOut = async () => {
+    await dispatch(userActions.signOut());
+  };
 
   return (
     <div>
@@ -17,6 +27,9 @@ export const Header: FC = () => {
           </li>
           <li>
             <Link to="/signup">signup</Link>
+          </li>
+          <li>
+            <button onClick={handleSignOut}>signout</button>
           </li>
           <li>
             <Link to="/tasks">tasks</Link>

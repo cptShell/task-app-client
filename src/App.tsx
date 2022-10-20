@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import {
   SignIn,
   SignUp,
@@ -30,9 +30,10 @@ function App() {
 
   return (
     <div>
-      <Header />
+      <Header user={user} />
       <div>
         <Routes>
+          <Route path="/" element={<Home />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
           {user && (
@@ -41,7 +42,7 @@ function App() {
               <Route path="/profile" element={<Profile user={user} />} />
             </Route>
           )}
-          <Route path="*" element={<Home />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
     </div>
