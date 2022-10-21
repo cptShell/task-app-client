@@ -5,3 +5,4 @@ export { Tasks } from './tasks/Tasks';
 export { Profile } from './profile/Profile';
 export { Header } from './header/Header';
 export { PrivateRoute } from './private-route/private-route';
+export { AuthRoute } from './auth-route/auth-route';

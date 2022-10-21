@@ -22,21 +22,28 @@ export const Header: FC<Props> = ({ user }) => {
           <li>
             <Link to="/">Home</Link>
           </li>
-          <li>
-            <Link to="/signin">signin</Link>
-          </li>
-          <li>
-            <Link to="/signup">signup</Link>
-          </li>
-          <li>
-            <button onClick={handleSignOut}>signout</button>
-          </li>
-          <li>
-            <Link to="/tasks">tasks</Link>
-          </li>
-          <li>
-            <Link to="/profile">profile</Link>
-          </li>
+          {user ? (
+            <>
+              <li>
+                <button onClick={handleSignOut}>signout</button>
+              </li>
+              <li>
+                <Link to="/tasks">tasks</Link>
+              </li>
+              <li>
+                <Link to="/profile">profile</Link>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Link to="/signin">signin</Link>
+              </li>
+              <li>
+                <Link to="/signup">signup</Link>
+              </li>
+            </>
+          )}
         </ul>
       </nav>
       {user && (
