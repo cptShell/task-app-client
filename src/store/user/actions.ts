@@ -6,7 +6,6 @@ import {
   LoginUserDTO,
   User,
 } from '../../common/types/types';
-import { userApi } from '../../services/services';
 import { ActionType } from './common';
 
 export const signIn = createAsyncThunk<
@@ -14,17 +13,10 @@ export const signIn = createAsyncThunk<
   LoginUserDTO,
   AsyncThunkConfig
 >(ActionType.SIGN_IN, async (payload, { extra }) => {
-  const { data, message } = await userApi.loginUser(payload);
-  if (data) {
-    return {
-      data: { token: data.token, ...data.user },
-      message,
-    };
-  }
+  const { userApi } = extra;
+  const response = await userApi.loginUser(payload);
 
-  console.log({ data, message });
-
-  return { data, message };
+  return response;
 });
 
 export const getAuthUser = createAsyncThunk<
@@ -32,50 +24,49 @@ export const getAuthUser = createAsyncThunk<
   void,
   AsyncThunkConfig
 >(ActionType.GET_AUTH_USER, async (_payload, { extra }) => {
-  const { data, message } = await userApi.getAuthUser();
+  const { userApi } = extra;
 
-  if (data) {
-    return {
-      data: { token: data.token, ...data.user },
-      message,
-    };
-  }
+  const response = await userApi.getAuthUser();
 
-  console.log({ data, message });
-
-  return { data, message };
+  return response;
 });
 
 export const signUp = createAsyncThunk<
   ApiResponse<User | null>,
   CreateUserDTO,
   AsyncThunkConfig
->(ActionType.SIGN_UP, async (payload) => {
-  const { data, message } = await userApi.createUser(payload);
-  if (data) {
-    return {
-      data,
-      message,
-    };
-  }
+>(ActionType.SIGN_UP, async (payload, { extra }) => {
+  const { userApi } = extra;
+  const response = await userApi.createUser(payload);
 
-  console.log({ data, message });
-
-  return { data, message };
+  return response;
 });
 
 export const signOut = createAsyncThunk<void, void, AsyncThunkConfig>(
   ActionType.SIGN_OUT,
   async (_payload, { extra }) => {
+    const { userApi } = extra;
+
     const response = await userApi.logoutUser();
-    console.log(response);
   }
 );
 
 export const deleteSelf = createAsyncThunk<void, void, AsyncThunkConfig>(
   ActionType.DELETE,
   async (_payload, { extra }) => {
-    const response = await userApi.deleteUser();
-    console.log(response);
+    const { userApi } = extra;
+
+    await userApi.deleteUser();
   }
 );
+
+export const updateName = createAsyncThunk<
+  ApiResponse<User | null>,
+  string,
+  AsyncThunkConfig
+>(ActionType.UPDATE_NAME, async (payload, { extra }) => {
+  const { userApi } = extra;
+  const response = await userApi.updateUser({ name: payload });
+
+  return response;
+});

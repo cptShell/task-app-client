@@ -59,11 +59,34 @@ export class UserApi {
         Authorization: `Bearer ${token}`,
       };
 
-      const { data } = await this.#axiosInstance.patch<UserDto>(
-        UserApiPath.PROFILE,
+      await this.#axiosInstance.patch<UserDto>(UserApiPath.PROFILE, payload, {
+        headers,
+      });
+
+      const response = await this.getAuthUser();
+
+      return response;
+    } catch (error) {
+      let message: string;
+
+      if (axios.isAxiosError(error)) {
+        message = (error.response?.data as ApiError).error;
+      } else {
+        message = error as string;
+      }
+
+      return { data: null, message };
+    }
+  }
+
+  async loginUser(payload: LoginUserDTO): Promise<ApiResponse<User | null>> {
+    try {
+      const { data } = await this.#axiosInstance.post<UserDto>(
+        UserApiPath.LOGIN,
         payload,
-        { headers }
+        { headers: { 'Content-Type': 'application/json' } }
       );
+      storage.setItem(StorageKey.TOKEN, data.token);
 
       return {
         data: { token: data.token, ...data.user },
@@ -82,30 +105,7 @@ export class UserApi {
     }
   }
 
-  async loginUser(payload: LoginUserDTO): Promise<ApiResponse<UserDto | null>> {
-    try {
-      const { data } = await this.#axiosInstance.post<UserDto>(
-        UserApiPath.LOGIN,
-        payload,
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-      storage.setItem(StorageKey.TOKEN, data.token);
-
-      return { data, message: 'ok' };
-    } catch (error) {
-      let message: string;
-
-      if (axios.isAxiosError(error)) {
-        message = (error.response?.data as ApiError).error;
-      } else {
-        message = error as string;
-      }
-
-      return { data: null, message };
-    }
-  }
-
-  async getAuthUser(): Promise<ApiResponse<UserDto | null>> {
+  async getAuthUser(): Promise<ApiResponse<User | null>> {
     const token = storage.getItem(StorageKey.TOKEN);
     const payload = { token };
 
@@ -118,7 +118,10 @@ export class UserApi {
         { headers: { 'Content-Type': 'application/json' } }
       );
 
-      return { data, message: 'ok' };
+      return {
+        data: { token: data.token, ...data.user },
+        message: 'ok',
+      };
     } catch (error) {
       let message: string;
 
